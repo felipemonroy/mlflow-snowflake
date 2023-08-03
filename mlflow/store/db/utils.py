@@ -4,6 +4,7 @@ import time
 from contextlib import contextmanager
 import logging
 
+from alembic.ddl.impl import DefaultImpl
 from alembic.migration import MigrationContext  # pylint: disable=import-error
 from alembic.script import ScriptDirectory
 import sqlalchemy
@@ -55,6 +56,10 @@ from mlflow.environment_variables import (
 _logger = logging.getLogger(__name__)
 
 MAX_RETRY_COUNT = 15
+
+
+class SnowflakeImpl(DefaultImpl):
+    __dialect__ = "snowflake"
 
 
 def _get_package_dir():
