@@ -35,13 +35,6 @@ def upgrade():
         sa.Column("dataset_schema", sa.Text(), nullable=True),
         sa.Column("dataset_profile", sa.Text().with_variant(MEDIUMTEXT, "mysql"), nullable=True),
         sa.PrimaryKeyConstraint("experiment_id", "name", "digest", name="dataset_pk"),
-        sa.Index(f"index_{SqlDataset.__tablename__}_dataset_uuid", "dataset_uuid", unique=False),
-        sa.Index(
-            f"index_{SqlDataset.__tablename__}_experiment_id_dataset_source_type",
-            "experiment_id",
-            "dataset_source_type",
-            unique=False,
-        ),
     )
     op.create_table(
         SqlInput.__tablename__,
@@ -52,14 +45,6 @@ def upgrade():
         sa.Column("destination_id", sa.String(length=36), primary_key=True, nullable=False),
         sa.PrimaryKeyConstraint(
             "source_type", "source_id", "destination_type", "destination_id", name="inputs_pk"
-        ),
-        sa.Index(f"index_{SqlInput.__tablename__}_input_uuid", "input_uuid", unique=False),
-        sa.Index(
-            f"index_{SqlInput.__tablename__}_destination_type_destination_id_source_type",
-            "destination_type",
-            "destination_id",
-            "source_type",
-            unique=False,
         ),
     )
     op.create_table(

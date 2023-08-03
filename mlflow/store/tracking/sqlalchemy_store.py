@@ -238,7 +238,9 @@ class SqlAlchemyStore(AbstractStore):
         with self.ManagedSessionMaker() as session:
             try:
                 creation_time = get_current_time_millis()
+                eid = session.query(sqlalchemy.func.max(SqlExperiment.experiment_id)).scalar() + 1
                 experiment = SqlExperiment(
+                    experiment_id=eid,
                     name=name,
                     lifecycle_stage=LifecycleStage.ACTIVE,
                     artifact_location=artifact_location,
@@ -246,12 +248,16 @@ class SqlAlchemyStore(AbstractStore):
                     last_update_time=creation_time,
                 )
                 experiment.tags = (
-                    [SqlExperimentTag(key=tag.key, value=tag.value) for tag in tags] if tags else []
+                    [
+                        SqlExperimentTag(experiment_id=eid, key=tag.key, value=tag.value)
+                        for tag in tags
+                    ]
+                    if tags
+                    else []
                 )
                 session.add(experiment)
                 if not artifact_location:
                     # this requires a double write. The first one to generate an autoincrement-ed ID
-                    eid = session.query(SqlExperiment).filter_by(name=name).first().experiment_id
                     experiment.artifact_location = self._get_artifact_location(eid)
             except sqlalchemy.exc.IntegrityError as e:
                 raise MlflowException(

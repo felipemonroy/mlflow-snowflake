@@ -68,12 +68,7 @@ class SqlExperiment(Base):
                                     Can be either ``active`` (default) or ``deleted``.
     """
 
-    __table_args__ = (
-        CheckConstraint(
-            lifecycle_stage.in_(["active", "deleted"]), name="experiments_lifecycle_stage"
-        ),
-        PrimaryKeyConstraint("experiment_id", name="experiment_pk"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("experiment_id", name="experiment_pk"),)
 
     def __repr__(self):
         return f"<SqlExperiment ({self.experiment_id}, {self.name})>"
@@ -146,12 +141,7 @@ class SqlRun(Base):
     SQLAlchemy relationship (many:one) with :py:class:`mlflow.store.dbmodels.models.SqlExperiment`.
     """
 
-    __table_args__ = (
-        CheckConstraint(source_type.in_(SourceTypes), name="source_type"),
-        CheckConstraint(status.in_(RunStatusTypes), name="status"),
-        CheckConstraint(lifecycle_stage.in_(["active", "deleted"]), name="runs_lifecycle_stage"),
-        PrimaryKeyConstraint("run_uuid", name="run_pk"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("run_uuid", name="run_pk"),)
 
 
 class SqlTag(Base):
