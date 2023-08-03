@@ -233,6 +233,12 @@ class SqlAlchemyStore(AbstractStore):
 
     def create_experiment(self, name, artifact_location=None, tags=None):
         _validate_experiment_name(name)
+
+        if self.get_experiment_by_name(name) is not None:
+            raise MlflowException(
+                f"Experiment(name={name}) already exists.", RESOURCE_ALREADY_EXISTS
+            )
+
         if artifact_location:
             artifact_location = resolve_uri_if_local(artifact_location)
         with self.ManagedSessionMaker() as session:
